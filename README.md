@@ -8,6 +8,8 @@ and talks to hardware directly through BIOS interrupts — no standard library,
 no OS services, no `malloc`. Run it ships as a small interactive paint program:
 steer a cursor with the keyboard, cycle colors, and stamp rectangles.
 
+![example](demo.png)
+
 ----------------------------
 FEATURES
 ----------------------------
