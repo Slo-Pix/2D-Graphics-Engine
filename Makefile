@@ -1,6 +1,6 @@
-flags := -fno-stack-protector -O0 -Wall -std=gnu23 -m16
-flags += -ffreestanding -I include -nostdlib
-ldflags := --nmagic --script=gui.ld
+flags := -fno-stack-protector -O0 -Wall -std=gnu2x -m16
+flags += -ffreestanding -I include -nostdlib -fno-pic -fno-pie
+ldflags := -m elf_i386 --nmagic --script=gui.ld
 objects := main.o shapes.o
 xobjects := xgfx.o
 NASMENV := -i include/asm/

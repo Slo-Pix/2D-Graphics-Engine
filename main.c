@@ -11,54 +11,143 @@ asm(
 void *heaptr, *heapsaved;
 extern boolean videoinit;
 
-void main() {
-    point *pnt1, *pnt2;
+void plot(int16 x, int16 y, int8 color) {
+    point *p;
+
+    save();
+    p = mkpoint(x, y, color);
+    if (p)
+        drawpoint(p);
+    load();
+
+    return;
+}
+
+void trail(int16 x0, int16 y0, int16 x1, int16 y1, int8 color) {
+    int16 t;
+
+    if (x0 == x1) {
+        if (y0 > y1) { t = y0; y0 = y1; y1 = t; }
+        for (; y0 <= y1; y0++)
+            plot(x0, y0, color);
+    }
+    else if (y0 == y1) {
+        if (x0 > x1) { t = x0; x0 = x1; x1 = t; }
+        for (; x0 <= x1; x0++)
+            plot(x0, y0, color);
+    }
+
+    return;
+}
+
+void box(int16 x1, int16 y1, int16 x2, int16 y2, int8 color) {
+    point *p1, *p2;
     rectangle *rct;
+    int16 t;
+
+    if (x1 > x2) { t = x1; x1 = x2; x2 = t; }
+    if (y1 > y2) { t = y1; y1 = y2; y2 = t; }
+    if ((x1 == x2) || (y1 == y2))
+        return;
+
+    save();
+    p1 = mkpoint(x1, y1, color);
+    p2 = mkpoint(x2, y2, color);
+    if (p1 && p2) {
+        rct = mkrectangle(p1, p2, color, 0, 2, false);
+        if (rct)
+            drawrectangle(rct);
+    }
+    load();
+
+    return;
+}
+
+void main() {
+    int16 cx, cy;
+    int16 oldx, oldy;
+    int16 anchorx, anchory;
+    int16 step;
+    int16 maxx, maxy;
     int8 clr;
-    int16 thickness;
+    int8 key;
+    boolean anchored;
 
     videoinit = false;
     freeall();
 
     videomode(x640x480x16);
 
+    maxx = getmaxx();
+    maxy = getmaxy();
+
+    cx = 320;
+    cy = 240;
+    anchorx = 0;
+    anchory = 0;
+    step = 8;
     clr = 2;
-    thickness = 10;
+    anchored = false;
 
-    pnt1 = mkpoint(10, 10, clr);
-    pnt2 = mkpoint(500, 300, clr);
-    if (!pnt1 || !pnt2) {
-        print($1 "Memory error\r\n");
-        return;
+    plot(cx, cy, clr);
+
+    for (;;) {
+        key = getchar();
+
+        if (key == 'q')
+            break;
+
+        if (key == 'c') {
+            clr++;
+            if (clr > 0xf)
+                clr = 1;
+            continue;
+        }
+        else if (key == ' ') {
+            anchorx = cx;
+            anchory = cy;
+            anchored = true;
+            continue;
+        }
+        else if (key == 'r') {
+            if (anchored)
+                box(anchorx, anchory, cx, cy, clr);
+            anchored = false;
+            continue;
+        }
+
+        oldx = cx;
+        oldy = cy;
+
+        if (key == 'w') {
+            if (cy >= step)
+                cy -= step;
+        }
+        else if (key == 's') {
+            if ((cy + step) <= maxy)
+                cy += step;
+        }
+        else if (key == 'a') {
+            if (cx >= step)
+                cx -= step;
+        }
+        else if (key == 'd') {
+            if ((cx + step) <= maxx)
+                cx += step;
+        }
+        else
+            continue;
+
+        trail(oldx, oldy, cx, cy, clr);
     }
 
-    rct = mkrectangle(pnt1, pnt2, clr, 0, thickness, false);
-    if (!rct) {
-        print($1 "Memory error\r\n");
-        return;
-    }
-
-    drawrectangle(rct);
-
-    getchar();
     freeall();
 
     return;
 }
 
 int8 getchar(void) {
-    int8 al, ah, ax;
-    int8 ret;
-
-    ax = xgetchar();
-    al = (ax & 0xf);
-    ah = ((ax & 0xf0) >> 4);
-    
-    ret = (al) ?
-            al :
-        ah;
-    
-    return ret;
+    return xgetchar();
 }
 
 void putchar(int8 c) {
