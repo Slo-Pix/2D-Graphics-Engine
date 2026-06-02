@@ -13,9 +13,13 @@ FEATURES
 ----------------------------
 
 [+] Pure freestanding 16-bit code — boots straight into VGA mode `0x12` (640x480, 16 colors).
+
 [+] Clean C-over-assembly layering: all BIOS interrupts isolated in one `.asm` file.
+
 [+] Custom bump allocator with `save`/`load` checkpoints (no `malloc`, no heap fragmentation).
+
 [+] Bit-packed shape primitives: points, lines, and rectangles.
+
 [+] Interactive WASD paint demo with color cycling and anchor-based rectangles.
 
 ----------------------------
@@ -23,9 +27,13 @@ REQUIREMENTS
 ----------------------------
 
 [+] `gcc` with 16-bit support (`-m16`).
+
 [+] `nasm` (assembler).
+
 [+] `ld` (GNU linker).
+
 [+] A real-mode environment to run the result, e.g. DOSBox or QEMU.
+
 
 On Debian/Ubuntu:
 
@@ -66,9 +74,13 @@ CONTROLS
 ----------------------------
 
 [+] `w` / `a` / `s` / `d` — move the cursor (draws a trail in the current color).
+
 [+] `c` — cycle the draw color (1-15).
+
 [+] `space` — drop a rectangle anchor at the cursor.
+
 [+] `r` — draw a rectangle from the anchor to the cursor.
+
 [+] `q` — quit.
 
 ----------------------------
@@ -76,10 +88,15 @@ PROJECT LAYOUT
 ----------------------------
 
 [+] [main.c](main.c) — entry point, interactive paint loop, heap allocator, and basic I/O.
+
 [+] [shapes.c](shapes.c) — shape constructors (`mk*`) and renderers (`draw*`).
+
 [+] [xgfx.asm](xgfx.asm) — the only layer that issues BIOS interrupts; reserves the heap.
+
 [+] [include/](include/gui.h) — core types, macros, packed shape structs, and prototypes.
+
 [+] [gui.ld](gui.ld) — linker script producing the flat `.COM` binary at origin `0x100`.
+
 [+] [Makefile](Makefile) — build rules and toolchain flags.
 
 For architecture details and contribution conventions, see [AGENTS.md](AGENTS.md).
